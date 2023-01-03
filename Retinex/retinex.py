@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import os
 import math
 # import imagesize
 def simple_balance(img, s1, s2):  # 线性增强，s1和s2为低高分段阈值百分比
@@ -70,9 +71,22 @@ def Pre_enhancement(img):
     dst = np.uint8(res) #dst = cv2.convertScaleAbs(res)
     return dst
 
+def load_img(train_imgPath,test_imgPath):
+    test_filenames = os.listdir(test_imgPath)
+    train_filenames = os.listdir(train_imgPath)
+
+    for tfname in train_filenames:
+        if os.path.isdir(tfname) == False:
+            filenames = os.listdir(train_imgPath+tfname)
+            for filename in filenames:  #  遍历文件
+                if filename.endswith('.png'):
+                    print(filename)
+
+
 
 if __name__ == '__main__':
-    img = './data/00001.png'
+    """
+    img = './data/5.png'
     size = 3
     src_img = cv2.imread(img)
     b_gray, g_gray, r_gray = cv2.split(src_img)
@@ -92,3 +106,30 @@ if __name__ == '__main__':
     cv2.imshow('Pre_enhancement',result_Pre)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+"""
+    # path_traindata = ".\\LOLdataset\\our485\\low\\"
+    # path_testdata = ".\\LOLdataset\\eval15\\low\\"
+    # path_save = ".\\results\\low\\"
+    path_traindata = "./LOLdataset/our485/low/"
+    path_testdata = "./LOLdataset/eval15/low/"
+    path_save = "./results/low/"
+    test_filenames = os.listdir(path_testdata)
+    train_filenames = os.listdir(path_traindata)
+    size = 3
+
+
+    for tfname in train_filenames:
+        if os.path.isdir(tfname) == False:
+            print('tfname',tfname)
+            filenames = os.listdir(path_traindata)
+            for filename in filenames:  #  遍历文件
+                if filename.endswith('.png'):
+                    img = path_traindata + filename
+                    src_img = cv2.imread(img)
+                    b_gray, g_gray, r_gray = cv2.split(src_img)
+                    b_gray_Pre = Pre_enhancement(b_gray)
+                    g_gray_Pre = Pre_enhancement(g_gray)
+                    r_gray_Pre = Pre_enhancement(r_gray)
+                    result_Pre = cv2.merge([b_gray_Pre, g_gray_Pre, r_gray_Pre])
+
+                    cv2.imwrite(path_save + filename, result_Pre)
