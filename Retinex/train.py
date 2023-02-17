@@ -42,10 +42,12 @@ if __name__ == '__main__':
     optimizer = torch.optim.Adam(model.parameters(),lr=0.003, betas=(0.9, 0.999), weight_decay=3e-4)
     loss_fun = nn.MSELoss
 
-    train_low_data_names = './LOLdataset/our485/low/'
+    # train_low_data_names = './LOLdataset/our485/low/'
+    train_low_data_names = './results/low2/'
     TrainDataset = MemoryFriendlyLoader(img_dir=train_low_data_names, task='train')
 
-    test_low_data_names = './LOLdataset/eval15/low/'
+    # test_low_data_names = './LOLdataset/eval15/low/'
+    test_low_data_names = './results/low2-e/'
     TestDataset = MemoryFriendlyLoader(img_dir=test_low_data_names, task='test')
 
     train_queue = torch.utils.data.DataLoader(
@@ -56,7 +58,7 @@ if __name__ == '__main__':
         TestDataset, batch_size=1,
         pin_memory=True, num_workers=0, shuffle=False)
 
-    epoch = 1
+    epoch = 10
     total_step = 0
     for epoch in range(epoch):
         model.train()
@@ -66,12 +68,13 @@ if __name__ == '__main__':
             input = Variable(input, requires_grad=False).cuda()
 
             optimizer.zero_grad()
-            loss = nn.MSELoss()
-            # loss.backward()
+            # loss = nn.MSELoss(input)
+            loss = model._loss(input)
+            loss.backward()
             nn.utils.clip_grad_norm_(model.parameters(), 5)
             optimizer.step()
 
-            # losses.append(loss.item())
+            losses.append(loss.item())
             # logging.info('train-epoch %03d %03d %f', epoch, batch_idx, loss)
             print('0 train-epoch {0},{1},{2}'.format(epoch, batch_idx, loss))
 
@@ -85,9 +88,14 @@ if __name__ == '__main__':
         model.eval()
         with torch.no_grad():
             for _, (input, image_name) in enumerate(test_queue):
-                input = Variable(input, volatile=True).cuda()
+                # input = Variable(input, volatile=True).cuda()
+                with torch.no_grad():
+                    input = Variable(input)
+                    input = input.cuda()
                 image_name = image_name[0].split('\\')[-1].split('.')[0]
-                illu_list, ref_list, input_list, atten = model(input)
+                illu_list, ref_list, input_list = model(input)
                 u_name = '%s.png' % (image_name + '_' + str(epoch))
                 u_path = image_path + '/' + u_name
+                # print("ref_list length：" + str(len(ref_list))+"illu_list length:"+str(len(illu_list)) + "input_list length:" + str(len(input_list)))
                 save_images(ref_list[0], u_path)
+        print("over!")

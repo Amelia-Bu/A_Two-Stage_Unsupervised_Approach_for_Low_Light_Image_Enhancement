@@ -2,12 +2,13 @@ import os
 import sys
 import torch
 
+import torchvision.datasets as datasets
 from UNet import *
 from torchvision.utils import save_image
+from utils import MemoryFriendlyLoader, MemoryFriendlyLoader1
 
-
-data_path = './results/low'
-save_path = './results/low1'
+data_path = './results/low2-e'
+save_path = './results/low3'
 os.makedirs(save_path, exist_ok=True)
 
 # net=UNet().cuda()
@@ -31,7 +32,7 @@ def main():
         print('no gpu device available')
         sys.exit(1)
 
-    model = Finetunemodel('./EXP/model_epochs/weights_0.pt')
+    model = Finetunemodel('./EXP/model_epochs/weights_9.pt')
     model = model.cuda()
 
     model.eval()
@@ -39,12 +40,16 @@ def main():
         for _, (input, image_name) in enumerate(test_queue):
             input = Variable(input, volatile=True).cuda()
             image_name = image_name[0].split('\\')[-1].split('.')[0]
-            print(input.shape)
+            # input =transforms.ToTensor(input)
+            # print(input.shape)
             i, r = model(input)
             u_name = '%s.png' % (image_name)
             print('processing {}'.format(u_name))
             u_path = save_path + '/' + u_name
-            save_images(r, u_path)
+            # input_op =i + r * input
+            input_op = i*r*input
+
+            save_images(input_op, u_path)
 
 
 

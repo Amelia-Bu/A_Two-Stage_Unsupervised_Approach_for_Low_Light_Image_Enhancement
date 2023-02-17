@@ -8,14 +8,14 @@ def simple_balance(img, s1, s2):  # 线性增强，s1和s2为低高分段阈值�
     res = img.copy()
     one_dim_array = res.flatten()  # 转化为一维数组
     sort_array = sorted(one_dim_array)  # 对一维数组按升序排序
-    print(len(sort_array))
+    # print(len(sort_array))
 
     per1 = int((h * w) * s1 / 100)
-    print(per1/len(sort_array))
+    # print(per1/len(sort_array))
     minvalue = sort_array[per1]
 
     per2 = int((h * w) * s2 / 100)
-    print(((h * w) - 1 - per2)/len(sort_array))
+    # print(((h * w) - 1 - per2)/len(sort_array))
     maxvalue = sort_array[(h * w) - 1 - per2]
 
     # 实施简单白平衡算法
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     # path_save = ".\\results\\low\\"
     path_traindata = "./LOLdataset/our485/low/"
     path_testdata = "./LOLdataset/eval15/low/"
-    path_save = "./results/low/"
+    path_save = "./results/low2/"
     test_filenames = os.listdir(path_testdata)
     train_filenames = os.listdir(path_traindata)
     size = 3
@@ -124,12 +124,13 @@ if __name__ == '__main__':
             filenames = os.listdir(path_traindata)
             for filename in filenames:  #  遍历文件
                 if filename.endswith('.png'):
-                    img = path_traindata + filename
+                    img = path_testdata + filename
                     src_img = cv2.imread(img)
                     b_gray, g_gray, r_gray = cv2.split(src_img)
                     b_gray_Pre = Pre_enhancement(b_gray)
                     g_gray_Pre = Pre_enhancement(g_gray)
                     r_gray_Pre = Pre_enhancement(r_gray)
                     result_Pre = cv2.merge([b_gray_Pre, g_gray_Pre, r_gray_Pre])
+                    print("Processing:"+filename)
 
                     cv2.imwrite(path_save + filename, result_Pre)
