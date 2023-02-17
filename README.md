@@ -1,5 +1,8 @@
-# A_Two-Stage_Unsupervised_Approach_for_Low_Light_Image_Enhancement
-论文复现
-这是一个Test
-还没复现完
-努力ing
+# A_Two-Stage_Unsupervised_Approach_for_Low_Light_Image_Enhancement 论文复现
+
+数据集：LOL 
+数据集获取链接：链接：https://pan.baidu.com/s/1bEMwcZxmVcwuJzphV7bR4g  提取码：kx55
+
+方法：Retinex理论进行预增强，UNet进行细化调整（主要是去噪）
+
+该实现与论文所述的实验细节还有一些差别：epoch = 10 （论文中为1000），UNet中具体每一层的参数设置等。
